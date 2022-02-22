@@ -1,0 +1,22 @@
+{
+  "IMPORTANT": "**This json file is ONLY for Webstorm to recognize aliases. babel.config.js is for javascript build configuration**",
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@styles/*": "./App/styles/*",
+      "@store/*": "./App/store/*",
+      "@store": "./App/store",
+      "@globals/*": "./App/globals/*",
+      "@commonComponents/*": "./commonComponents/*",
+      "@ads/*": "./App/ads/*",
+      "@services/*": "./App/services/*",
+      "@formSchemas/*": "./App/formSchemas/*",
+      "@prototypes": "./prototypes",
+      "@assets/*": "./App/assets/*"
+    }
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
