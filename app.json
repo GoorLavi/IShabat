@@ -23,8 +23,8 @@
       "package": "com.goorl.IShabat"
     },
     "ios": {
-      "config": {
-      }
+      "config": {},
+      "bundleIdentifier": "com.goorl.IShabat"
     },
     "description": "",
     "plugins": [
