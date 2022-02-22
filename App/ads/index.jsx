@@ -69,7 +69,7 @@ export const AdsProvider = ({children}) => {
             if (!Device.isDevice || __DEV__) {
                 // unitId that should be used if we want to test ads.
                 await setTestDeviceIDAsync('EMULATOR');
-                unitId = Platform.select({
+                unitId = pickByPlatform({
                     ios: constants.IOS_REWARDED_TEST_UNIT_ID,
                     android: constants.ANDROID_REWARDED_TEST_UNIT_ID,
                 });
