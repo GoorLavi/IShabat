@@ -5,7 +5,7 @@ export default ({} = {}) => {
     return StyleSheet.create({
         safeAreaTopView: {
             flex: 0,
-            backgroundColor: getColor('dark', 'darker')
+            backgroundColor: 'transparent'
         },
         safeAreaBottomView: {
             flex: 1,
