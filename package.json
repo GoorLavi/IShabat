@@ -26,6 +26,7 @@
     "expo-notifications": "~0.14.0",
     "expo-splash-screen": "~0.14.1",
     "expo-status-bar": "~1.2.0",
+    "expo-tracking-transparency": "~2.1.0",
     "expo-updates": "~0.11.6",
     "lodash": "^4.17.20",
     "polished": "^4.0.5",

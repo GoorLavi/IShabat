@@ -10,8 +10,7 @@ export default function Home({navigation}) {
     const styles = useMemo(() => getStyles(), []);
 
     return <View {...{style: styles.container}}>
-        <View {...{style: styles.headerContainer}}>
-        </View>
+        <View {...{style: styles.headerContainer}} />
         <Image {...{style: styles.headerImage, source: require('../../../assets/header-logo.png')}}/>
         <View {...{style: styles.content}}>
             <Text style={{fontSize: 20, fontWeight: 'bold', textAlign: 'center'}}>{texts.WELCOME_USER}</Text>

@@ -2,7 +2,7 @@
   "expo": {
     "name": "IShabat",
     "slug": "IShabat",
-    "version": "1.0.1",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./App/assets/icon-36.png",
     "splash": {
@@ -34,7 +34,8 @@
           "icon": "./App/assets/icon-36.png",
           "color": "#ffffff"
         }
-      ]
+      ],
+      "expo-tracking-transparency"
     ]
   }
 }

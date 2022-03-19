@@ -17,6 +17,7 @@ export default ({} = {}) => {
             flex: 1,
             flexDirection: 'column',
             backgroundColor: getColor('background'),
+            height: '100%'
         },
         headerContainer: {
             marginTop: -headerContainerHeightSize + visibleSectionSize,
@@ -34,7 +35,8 @@ export default ({} = {}) => {
             display: 'flex',
             marginTop: 20,
             alignItems: 'center',
-            flex: 1
+            flexGrow: 1,
+            flexShrink: 1
         },
         headerImage: {
             position: 'absolute',

@@ -5,25 +5,34 @@ import {StyleSheet, Dimensions} from 'react-native'
 export default ({} = {}) => {
     return StyleSheet.create({
         RemindersList: {
-            marginTop: 40,
-            flexDirection: 'column',
             display: 'flex',
+            flexDirection: 'column',
+            marginTop: 40,
             width: '90%',
             paddingHorizontal: 20,
-            // marginBottom: 200
+        },
+        ScrollWrapper: {
+            flexGrow: 1,
+            flexShrink: 1,
+            display: 'flex',
+            // overflow: 'hidden'
         },
         List: {
+            display: 'flex',
+            flexDirection: 'column',
             width: '100%',
             marginBottom: 20,
-            display: 'flex',
-            marginTop: 10,
-
         },
         RemindersHeader: {
+            width: '100%',
             textAlign: 'right',
             fontSize: 20,
             fontWeight: 'bold',
             fontFamily: 'shofar',
+            // flexGrow: 0.5
+        },
+        addTaskButton: {
+            height: 50
         }
     });
 };
