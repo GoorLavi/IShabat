@@ -1,4 +1,8 @@
 import * as Notifications from 'expo-notifications';
+import StorageService from '@services/storageService';
+
+
+export const notificationInitializedKey = 'is-notifications-initialized';
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -8,6 +12,9 @@ Notifications.setNotificationHandler({
     }),
 });
 
+
+const identifier = 'shabat';
+
 export const setEvent = async ({date, type}) => {
     const isShabat = type === "שבת";
 
@@ -15,23 +22,27 @@ export const setEvent = async ({date, type}) => {
     const eventBodyTemplate = time => `עוד ${time} לכניסת ${isShabat ? "השבת" : "החג"}`;
 
     const title = getTitle();
-    const groupName = 'shabat';
 
     const hourEventDate = new Date(date.setMinutes(date.getMinutes() - 60));
-    await scheduleNotification({date: hourEventDate, title, groupName, body: eventBodyTemplate("שעה")});
+    await scheduleNotification({date: hourEventDate, title, groupName: identifier, body: eventBodyTemplate("שעה")});
 
     const halfAnHourEventDate = new Date(new Date(date).setMinutes(date.getMinutes() - 30));
-    await scheduleNotification({date: halfAnHourEventDate, title, groupName, body: eventBodyTemplate("חצי שעה")});
+    await scheduleNotification({
+        date: halfAnHourEventDate,
+        title,
+        groupName: identifier,
+        body: eventBodyTemplate("חצי שעה")
+    });
 }
 
-export const scheduleNotification = async ({date, title, groupName, body}) => {
+export const scheduleNotification = async ({date, title, body}) => {
 
     await Notifications.scheduleNotificationAsync({
         content: {
             title,
             body,
             sound: 'default' | 'defaultCritical',
-            categoryIdentifier: groupName,
+            categoryIdentifier: identifier,
             data: {
                 date
             },
@@ -41,3 +52,30 @@ export const scheduleNotification = async ({date, title, groupName, body}) => {
         trigger: date,
     });
 }
+
+export const getAllNotifications = async () => {
+    const notifications = await Notifications.getAllScheduledNotificationsAsync();
+    console.log({notifications});
+}
+
+
+export const cancelAllNotifications = async () => {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+}
+
+export const getPermission = async () => {
+    return await Notifications.getPermissionsAsync()
+}
+
+
+export const isNotificationPermissionGranted = async () => {
+    const {status} = await getPermission();
+
+    return status === 'granted';
+}
+
+export const isNotificationInitialized = async () => {
+    return await StorageService.getItem(notificationInitializedKey);
+}
+
+

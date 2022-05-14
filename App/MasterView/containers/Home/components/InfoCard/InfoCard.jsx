@@ -19,9 +19,9 @@ export default () => {
             <Text {...{style: styles.Date}}>{formatDate(nextEvent?.date)}</Text>
         </View>
 
-        <Text {...{style: styles.TimeText}}>{texts.START_LABEL} {nextEvent[`${city}_in`]}</Text>
-        <Text {...{style: styles.TimeText}}>{texts.END_LABEL} {nextEvent[`${city}_out`]}</Text>
-        <Text {...{style: styles.Parasha}}>{`${texts.PARASHA} ${nextEvent.parasha}`}</Text>
+        <Text {...{style: styles.TimeText}}>{texts.START_LABEL} {nextEvent?.[`${city}_in`]}</Text>
+        <Text {...{style: styles.TimeText}}>{texts.END_LABEL} {nextEvent?.[`${city}_out`]}</Text>
+        <Text {...{style: styles.Parasha}}>{`${texts.PARASHA} ${nextEvent?.parasha}`}</Text>
 
         <Image {...{style: styles.MosheImage, source: require('@assets/Moshe.png')}}/>
 

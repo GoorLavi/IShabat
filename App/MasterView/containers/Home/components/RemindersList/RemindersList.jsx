@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useRef} from 'react';
 import {View, Text, ScrollView, FlatList} from 'react-native';
 import {texts} from './constants';
 import useReminders from '@store/reminders/reminders';
@@ -13,50 +13,33 @@ export default function ReminderList() {
 
     const {reminders, addReminder, setReminder, removeReminder} = useReminders();
 
+    const scrollViewRef = useRef()
+
+    const onCreateNewReminder = useCallback(async () => {
+        await addReminder();
+        setTimeout(() => {
+            scrollViewRef.current.scrollToEnd({animated: true});
+        }, 400);
+
+    }, []);
 
     return <View {...{style: styles.RemindersList}}>
         {
-            !!reminders?.length && <>
+            !!reminders?.length && <View style={styles.RemindersContent}>
                 <Text style={styles.RemindersHeader}>{texts.REMINDERS_HEADER}</Text>
-                {/*<View {...{style: styles.ScrollWrapper}}>*/}
-                {/*<ScrollView*/}
-                {/*    // contentContainerStyle={styles.List}*/}
-                {/*    {...{*/}
-                {/*        contentContainerStyle: {*/}
-                {/*            flexGrow: 1,*/}
-                {/*            flexShrink: 1,*/}
-                {/*            width: '100%',*/}
-                {/*            display: 'flex',*/}
-                {/*            // height: '60%'*/}
-                {/*        },*/}
-                {/*        // style: {flexGrow: 1, flexShrink:1 , width: '100%', display: 'flex'}*/}
-                {/*    }}*/}
-                {/*    automaticallyAdjustContentInsets*/}
-                {/*>*/}
-                    <FlatList
-                        data={reminders.map(reminder => ({
+                <View {...{style: styles.ScrollWrapper}}>
+                    <ScrollView{...{ref: scrollViewRef, style: styles.List}} automaticallyAdjustContentInsets>
+                        {reminders.map(reminder => <Reminder {...{
                             key: reminder.id,
                             reminder,
                             setReminder,
                             removeReminder
-                        }))}
-                        renderItem={Reminder}
-                    />
-
-                {/*</ScrollView>*/}
-            </>
+                        }}/>)}
+                    </ScrollView>
+                </View>
+            </View>
         }
-        <AddTask {...{onPress: addReminder, style: styles.addTaskButton}} />
+        <AddTask {...{onPress: onCreateNewReminder, style: styles.addTaskButton}} />
     </View>
 }
 
-// {/*<FlatList*/}
-// {/*    data={reminders.map(reminder => ({*/}
-// {/*        key: reminder.id,*/}
-// {/*        reminder,*/}
-// {/*        setReminder,*/}
-// {/*        removeReminder*/}
-// {/*    }))}*/}
-// {/*    renderItem={Reminder}*/}
-// />
-// {/*</View>*/}

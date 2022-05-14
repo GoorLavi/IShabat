@@ -6,9 +6,11 @@ import Icon from '@commonComponents/Icon';
 import getStyles from './styles';
 
 
-export default function Reminder({item}) {
-
-    const {setReminder, removeReminder, reminder} = item;
+export default function Reminder({
+                                     reminder,
+                                     setReminder,
+                                     removeReminder
+                                 }) {
 
     const {isNew, isDone, value, id} = reminder;
     const styles = getStyles({isDone});
