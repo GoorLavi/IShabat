@@ -1,14 +1,14 @@
 import {useEffect} from 'react'
-import StorageService from '@services/storageService/index'
 import {
     setEvent,
     getAllNotifications,
     isNotificationPermissionGranted,
     isNotificationInitialized,
-    getPermission
+    askPermission,
+    cancelAllNotifications,
+    setNotificationInitialized
 } from '@globals/notifications'
 import {findComingEvents} from '@store/nextEvent/helper'
-
 
 const setUpEventsNotifications = async () => {
 
@@ -34,10 +34,7 @@ export default () => {
             let isPermissionGranted = await isNotificationPermissionGranted();
 
             if (!isPermissionGranted) {
-                await getPermission();
-
-                isPermissionGranted = await isNotificationPermissionGranted();
-                debugger;
+                isPermissionGranted = await askPermission();
 
                 console.log({isPermissionGranted})
                 if (!isPermissionGranted) {
@@ -46,10 +43,9 @@ export default () => {
                 }
             }
 
-            // Todo uncomment
             if (!initialized) {
                 await setUpEventsNotifications();
-                await StorageService.setItem(name, true);
+                await setNotificationInitialized(name, true);
             }
         })()
     }, [])

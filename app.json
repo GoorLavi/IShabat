@@ -2,7 +2,7 @@
   "expo": {
     "name": "IShabat",
     "slug": "IShabat",
-    "version": "1.0.4",
+    "version": "1.0.6",
     "orientation": "portrait",
     "icon": "./App/assets/icon-36.png",
     "splash": {

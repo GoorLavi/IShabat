@@ -67,6 +67,10 @@ export const getPermission = async () => {
     return await Notifications.getPermissionsAsync()
 }
 
+export const askPermission = async () => {
+    return await Notifications.requestPermissionsAsync();
+}
+
 
 export const isNotificationPermissionGranted = async () => {
     const {status} = await getPermission();
@@ -76,6 +80,11 @@ export const isNotificationPermissionGranted = async () => {
 
 export const isNotificationInitialized = async () => {
     return await StorageService.getItem(notificationInitializedKey);
+}
+
+
+export const setNotificationInitialized = async (value) => {
+    return await StorageService.setItem(notificationInitializedKey, value);
 }
 
 
