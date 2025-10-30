@@ -35,7 +35,8 @@
           "color": "#ffffff"
         }
       ],
-      "expo-tracking-transparency"
+      "expo-tracking-transparency",
+      "expo-font"
     ]
   }
 }
