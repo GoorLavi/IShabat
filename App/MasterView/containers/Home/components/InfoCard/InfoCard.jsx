@@ -23,7 +23,5 @@ export default () => {
         <Text {...{style: styles.TimeText}}>{texts.END_LABEL} {nextEvent?.[`${city}_out`]}</Text>
         <Text {...{style: styles.Parasha}}>{`${texts.PARASHA} ${nextEvent?.parasha}`}</Text>
 
-        <Image {...{style: styles.MosheImage, source: require('@assets/Moshe.png')}}/>
-
     </View>
 }

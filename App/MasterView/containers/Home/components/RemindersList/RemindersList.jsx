@@ -1,45 +1,53 @@
-import React, {useCallback, useRef} from 'react';
-import {View, Text, ScrollView, FlatList} from 'react-native';
-import {texts} from './constants';
-import useReminders from '@store/reminders/reminders';
-import Reminder from './components/Reminder/Reminder';
-import getStyles from './styles';
-import AddTask from './components/AddTask/AddTask';
+import React, { useCallback } from "react";
+import { View, Text } from "react-native";
+import { texts } from "./constants";
+import useReminders from "@store/reminders/reminders";
+import Reminder from "./components/Reminder/Reminder";
+import getStyles from "./styles";
+import AddTask from "./components/AddTask/AddTask";
 
+export default function ReminderList({ scrollViewRef }) {
+  const styles = getStyles();
 
-export default function ReminderList() {
+  const { reminders, addReminder, setReminder, removeReminder } =
+    useReminders();
 
-    const styles = getStyles();
+  const handleAddTask = useCallback(
+    (taskText) => {
+      if (!taskText?.trim()) return;
 
-    const {reminders, addReminder, setReminder, removeReminder} = useReminders();
+      // Create reminder with the text already set
+      addReminder(taskText.trim());
+    },
+    [addReminder]
+  );
 
-    const scrollViewRef = useRef()
+  const handleShowFloatingInput = useCallback(() => {
+    // Add a new empty reminder (will auto-focus due to isNew flag)
+    addReminder("");
+  }, [addReminder]);
 
-    const onCreateNewReminder = useCallback(async () => {
-        await addReminder();
-        setTimeout(() => {
-            scrollViewRef.current.scrollToEnd({animated: true});
-        }, 400);
-
-    }, []);
-
-    return <View {...{style: styles.RemindersList}}>
-        {
-            !!reminders?.length && <View style={styles.RemindersContent}>
-                <Text style={styles.RemindersHeader}>{texts.REMINDERS_HEADER}</Text>
-                <View {...{style: styles.ScrollWrapper}}>
-                    <ScrollView{...{ref: scrollViewRef, style: styles.List}} automaticallyAdjustContentInsets>
-                        {reminders.map(reminder => <Reminder {...{
-                            key: reminder.id,
-                            reminder,
-                            setReminder,
-                            removeReminder
-                        }}/>)}
-                    </ScrollView>
-                </View>
-            </View>
-        }
-        <AddTask {...{onPress: onCreateNewReminder, style: styles.addTaskButton}} />
+  return (
+    <View {...{ style: styles.RemindersList }}>
+      {!!reminders?.length && (
+        <View style={styles.RemindersContent}>
+          <Text style={styles.RemindersHeader}>{texts.REMINDERS_HEADER}</Text>
+          <View style={styles.List}>
+            {reminders.map((reminder, index) => (
+              <Reminder
+                key={reminder.id}
+                {...{ reminder, setReminder, removeReminder, scrollViewRef }}
+              />
+            ))}
+          </View>
+        </View>
+      )}
+      <AddTask
+        {...{
+          onPress: handleShowFloatingInput,
+          style: styles.addTaskButton,
+        }}
+      />
     </View>
+  );
 }
-

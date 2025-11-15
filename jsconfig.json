@@ -9,7 +9,6 @@
       "@store": "./App/store",
       "@globals/*": "./App/globals/*",
       "@commonComponents/*": "./commonComponents/*",
-      "@ads/*": "./App/ads/*",
       "@services/*": "./App/services/*",
       "@formSchemas/*": "./App/formSchemas/*",
       "@prototypes": "./prototypes",

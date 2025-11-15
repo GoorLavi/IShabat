@@ -1,4 +1,4 @@
 export const texts = {
-    EMAIL_LINK: 'Contact Us',
-    GMAIL: 'goorlavi1@gmail.com',
+  EMAIL_LINK: "צור קשר",
+  GMAIL: "shabat.products@gmail.com",
 };

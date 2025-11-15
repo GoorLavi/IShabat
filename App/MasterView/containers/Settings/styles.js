@@ -1,38 +1,212 @@
-import {getColor} from '@styles/helper';
-import {StyleSheet} from 'react-native'
+import { getColor } from "@styles/helper";
+import { StyleSheet } from "react-native";
 
 export default ({} = {}) => {
-    return StyleSheet.create({
-        container: {
-            display: 'flex',
-            flex: 1,
-            flexDirection: 'column',
-            backgroundColor: getColor('background'),
-            padding: 20,
-        },
-        header: {
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginBottom: 60
-        },
-        content: {
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            flex: 1
-        },
-        backIcon: {
-            position: 'absolute',
-            left: 0
-        },
-        headerTitle: {
-            fontSize: 35
-        },
-        saveButton: {
-            margin: 'auto'
-        }
-    });
+  return StyleSheet.create({
+    container: {
+      display: "flex",
+      flex: 1,
+      flexDirection: "column",
+      backgroundColor: getColor("background"),
+      padding: 20,
+    },
+    header: {
+      width: "100%",
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 20,
+    },
+    scrollContent: {
+      flex: 1,
+    },
+    content: {
+      width: "100%",
+      display: "flex",
+      alignItems: "center",
+      paddingBottom: 40,
+    },
+    backIcon: {
+      position: "absolute",
+      left: 0,
+    },
+    headerTitle: {
+      fontSize: 32,
+      fontWeight: "bold",
+    },
+    devModeTrigger: {
+      position: "absolute",
+      right: 0,
+      width: 60,
+      height: 60,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    devModeIndicator: {
+      fontSize: 24,
+    },
+    section: {
+      width: "100%",
+      marginBottom: 30,
+    },
+    sectionLabel: {
+      fontSize: 24,
+      fontWeight: "bold",
+      textAlign: "right",
+      marginBottom: 15,
+      color: getColor("primary", "contrast"),
+    },
+    sectionHeader: {
+      fontSize: 26,
+      fontWeight: "bold",
+      textAlign: "right",
+      marginBottom: 20,
+      color: getColor("primary", "contrast"),
+    },
+    citiesContainer: {
+      width: "100%",
+    },
+    cityOption: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "flex-end",
+      paddingVertical: 12,
+      paddingHorizontal: 15,
+      marginBottom: 8,
+      backgroundColor: getColor("light"),
+      borderRadius: 10,
+      borderWidth: 2,
+      borderColor: "transparent",
+    },
+    cityOptionSelected: {
+      borderColor: getColor("primary", "contrast"),
+      backgroundColor: getColor("primary", "main"),
+    },
+    cityLabel: {
+      fontSize: 20,
+      textAlign: "right",
+      marginLeft: 10,
+      fontFamily: "stam",
+      color: getColor("background", "contrast"),
+    },
+    radioCircle: {
+      height: 20,
+      width: 20,
+      borderRadius: 10,
+      borderWidth: 2,
+      borderColor: getColor("primary", "contrast"),
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    radioCircleSelected: {
+      borderColor: getColor("primary", "contrast"),
+    },
+    radioCircleInner: {
+      height: 10,
+      width: 10,
+      borderRadius: 5,
+      backgroundColor: getColor("primary", "contrast"),
+    },
+    inputGroup: {
+      width: "100%",
+      marginBottom: 20,
+    },
+    inputLabel: {
+      fontSize: 18,
+      textAlign: "right",
+      marginBottom: 8,
+      fontFamily: "stam",
+      color: getColor("background", "contrast"),
+    },
+    input: {
+      width: "100%",
+      borderWidth: 1,
+      borderColor: getColor("light", "dark"),
+      borderRadius: 8,
+      padding: 12,
+      fontSize: 18,
+      backgroundColor: getColor("light"),
+      textAlign: "right",
+    },
+    saveButton: {
+      width: "100%",
+      paddingVertical: 15,
+      backgroundColor: getColor("primary"),
+      borderRadius: 10,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 20,
+    },
+    saveButtonText: {
+      fontSize: 22,
+      fontWeight: "bold",
+      fontFamily: "stam",
+      color: getColor("primary", "contrast"),
+    },
+    testButton: {
+      width: "100%",
+      paddingVertical: 15,
+      backgroundColor: getColor("secondary", "main") || "#FF9800",
+      borderRadius: 10,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: 20,
+    },
+    testButtonText: {
+      fontSize: 18,
+      fontWeight: "bold",
+      fontFamily: "stam",
+      color: "#FFFFFF",
+    },
+    devSection: {
+      width: "100%",
+      marginBottom: 30,
+      padding: 20,
+      backgroundColor: getColor("light", "dark") || "#F5F5F5",
+      borderRadius: 10,
+      borderWidth: 2,
+      borderColor: "#2196F3",
+    },
+    devSectionHeader: {
+      fontSize: 24,
+      fontWeight: "bold",
+      textAlign: "right",
+      marginBottom: 15,
+      fontFamily: "stam",
+      color: "#2196F3",
+    },
+    devModeToggle: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "flex-end",
+      marginBottom: 15,
+    },
+    devModeLabel: {
+      fontSize: 18,
+      marginRight: 10,
+      fontFamily: "stam",
+      color: getColor("background", "contrast"),
+    },
+    devSettingsButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      backgroundColor: "#2196F3",
+      borderRadius: 8,
+      marginTop: 10,
+    },
+    devSettingsButtonText: {
+      fontSize: 18,
+      fontWeight: "bold",
+      fontFamily: "stam",
+      color: "#FFFFFF",
+      marginLeft: 8,
+    },
+    devSettingsIcon: {
+      color: "#FFFFFF",
+    },
+  });
 };

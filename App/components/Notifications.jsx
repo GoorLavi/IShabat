@@ -1,54 +1,62 @@
-import {useEffect} from 'react'
+import { useEffect } from "react";
 import {
-    setEvent,
-    getAllNotifications,
-    isNotificationPermissionGranted,
-    isNotificationInitialized,
-    askPermission,
-    cancelAllNotifications,
-    setNotificationInitialized
-} from '@globals/notifications'
-import {findComingEvents} from '@store/nextEvent/helper'
-
-const setUpEventsNotifications = async () => {
-
-    const events = findComingEvents();
-
-    for (const {date, TelAviv_in, type} of events) {
-        await setEvent({
-            type,
-            date: new Date(`${date}T${TelAviv_in}`)
-        })
-    }
-}
+  getAllNotifications,
+  isNotificationPermissionGranted,
+  isNotificationInitialized,
+  askPermission,
+  setNotificationInitialized,
+} from "@globals/notifications";
+import { rescheduleAllNotifications } from "@globals/notificationScheduler";
+import useUser from "@store/user/user";
+import useReminders from "@store/reminders/reminders";
+import useNextEvent from "@store/nextEvent/nextEvent";
+import useDeveloper from "@store/developer/developer";
 
 export default () => {
+  const { city, notificationTimes } = useUser();
+  const { areAllCompleted } = useReminders();
+  const { nextEvent } = useNextEvent();
+  const {
+    isDevMode,
+    notificationTestTimes,
+    eventDateOverride,
+    eventTimeOverride,
+  } = useDeveloper();
 
+  useEffect(() => {
+    (async () => {
+      await getAllNotifications();
 
-    useEffect(() => {
-        (async () => {
-            await getAllNotifications();
+      const initialized = await isNotificationInitialized();
 
-            const initialized = await isNotificationInitialized();
+      let isPermissionGranted = await isNotificationPermissionGranted();
 
-            let isPermissionGranted = await isNotificationPermissionGranted();
+      if (!isPermissionGranted) {
+        isPermissionGranted = await askPermission();
 
-            if (!isPermissionGranted) {
-                isPermissionGranted = await askPermission();
+        console.log({ isPermissionGranted });
+        if (!isPermissionGranted) {
+          alert("האפליקציה צריכה אישור להשתמש בהתראות");
+          return;
+        }
+      }
 
-                console.log({isPermissionGranted})
-                if (!isPermissionGranted) {
-                    alert('האפליקציה צריכה אישור להשתמש בהתראות');
-                    return;
-                }
-            }
+      if (!initialized) {
+        const allCompleted = areAllCompleted();
+        await rescheduleAllNotifications(city, notificationTimes, allCompleted);
+        await setNotificationInitialized(true);
+      }
+    })();
+  }, [
+    city,
+    notificationTimes,
+    nextEvent?.date,
+    nextEvent?.TelAviv_in,
+    isDevMode,
+    notificationTestTimes,
+    eventDateOverride,
+    eventTimeOverride,
+  ]); // Also trigger when event date/time changes or dev mode changes
 
-            if (!initialized) {
-                await setUpEventsNotifications();
-                await setNotificationInitialized(name, true);
-            }
-        })()
-    }, [])
-
-    return null;
-}
+  return null;
+};
