@@ -2,9 +2,9 @@
   "expo": {
     "name": "IShabat",
     "slug": "IShabat",
-    "version": "1.0.10",
+    "version": "1.0.12",
     "orientation": "portrait",
-    "icon": "./App/assets/icon-36.png",
+    "icon": "./App/assets/icon.png",
     "splash": {
       "image": "./App/assets/splash.png",
       "resizeMode": "contain",
@@ -18,11 +18,11 @@
       "favicon": "./App/assets/favicon.png"
     },
     "android": {
-      "package": "com.goorl.IShabat"
+      "package": "com.goorlavi.IShabat"
     },
     "ios": {
       "config": {},
-      "bundleIdentifier": "com.goorl.IShabat",
+      "bundleIdentifier": "com.goorlavi.IShabat",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -32,7 +32,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./App/assets/icon-36.png",
+          "icon": "./App/assets/icon.png",
           "color": "#ffffff"
         }
       ],
