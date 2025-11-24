@@ -104,19 +104,25 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            if (project.hasProperty('ISHABAT_RELEASE_STORE_FILE')) {
+                storeFile file(ISHABAT_RELEASE_STORE_FILE)
+                storePassword ISHABAT_RELEASE_STORE_PASSWORD
+                keyAlias ISHABAT_RELEASE_KEY_ALIAS
+                keyPassword ISHABAT_RELEASE_KEY_PASSWORD
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
-            def enableShrinkResources = findProperty('android.enableShrinkResourcesInReleaseBuilds') ?: 'false'
-            shrinkResources enableShrinkResources.toBoolean()
+            signingConfig signingConfigs.release
             minifyEnabled enableMinifyInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            def enableShrinkResources = findProperty('android.enableShrinkResourcesInReleaseBuilds') ?: 'false'
+            shrinkResources enableShrinkResources.toBoolean()
             def enablePngCrunchInRelease = findProperty('android.enablePngCrunchInReleaseBuilds') ?: 'true'
             crunchPngs enablePngCrunchInRelease.toBoolean()
         }
