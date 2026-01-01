@@ -4,6 +4,13 @@ import { TextInput, View, Dimensions } from "react-native";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
 import Icon from "@commonComponents/Icon";
 import getStyles from "./styles";
+import useReminders from "@store/reminders/reminders";
+import useNextEvent from "@store/nextEvent/nextEvent";
+import useUser from "@store/user/user";
+import { cancelNotificationsForEvent } from "@globals/notifications";
+import { rescheduleAllNotifications } from "@globals/notificationScheduler";
+import { getEventDateTime } from "@globals/utils";
+import { devLogInfo, devLogWarn } from "@utils/devLogger";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 
@@ -16,6 +23,8 @@ export default function Reminder({
   const { isNew, checked, value, id } = reminder;
   const styles = getStyles({ isDone: checked });
   const reminderViewRef = useRef(null);
+  const { nextEvent } = useNextEvent();
+  const { city, notificationTimes } = useUser();
 
   const onChangeText = useCallback(
     (value) => {
@@ -25,10 +34,32 @@ export default function Reminder({
   );
 
   const onCheck = useCallback(
-    (checked) => {
+    async (checked) => {
       setReminder({ ...reminder, checked });
+
+      // Get current state to check if all will be complete after this change
+      const { areAllCompleted } = useReminders.getState();
+      const allComplete = areAllCompleted();
+
+      if (!nextEvent || !city) return;
+      const eventInTime = nextEvent[`${city}_in`];
+      if (!eventInTime || eventInTime === "---") return;
+
+      const eventDateTime = getEventDateTime(nextEvent.date, eventInTime);
+
+      if (checked && allComplete) {
+        // Just completed all todos - cancel notifications for this event
+        await cancelNotificationsForEvent(eventDateTime);
+        devLogInfo(
+          `✅ All todos completed - cancelled notifications for event ${nextEvent.date}`
+        );
+      } else if (!checked && !allComplete) {
+        // Just unchecked - reschedule notifications
+        await rescheduleAllNotifications(city, notificationTimes);
+        devLogInfo(`🔄 Todo unchecked - rescheduled notifications`);
+      }
     },
-    [setReminder, reminder]
+    [setReminder, reminder, nextEvent, city, notificationTimes]
   );
 
   const _removeReminder = useCallback(() => {
@@ -54,7 +85,7 @@ export default function Reminder({
           });
         },
         () => {
-          console.warn("Failed to measure reminder position");
+          devLogWarn("Failed to measure reminder position");
         }
       );
     }

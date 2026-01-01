@@ -15,6 +15,7 @@ module.exports = function (api) {
             "@prototypes": "./prototypes",
             "@assets": "./App/assets",
             "@store": "./App/store",
+            "@utils": "./App/utils",
           },
         },
       ],

@@ -1,5 +1,47 @@
 [
   {
+    "date": "2025-12-12",
+    "parasha": "וישב",
+    "heb_date": "כ״ג כסלו ה'תשפ\"ו",
+    "type": "שבת",
+    "Jerusalem_in": "16:01",
+    "Jerusalem_out": "17:16",
+    "TelAviv_in": "16:15",
+    "TelAviv_out": "17:17",
+    "Hayfa_in": "16:04",
+    "Hayfa_out": "17:15",
+    "BeerSheva_in": "16:19",
+    "BeerSheva_out": "17:19"
+  },
+  {
+    "date": "2025-12-19",
+    "parasha": "מקץ (שבת חנוכה)",
+    "heb_date": "ל׳ כסלו ה'תשפ\"ו",
+    "type": "שבת",
+    "Jerusalem_in": "16:04",
+    "Jerusalem_out": "17:19",
+    "TelAviv_in": "16:18",
+    "TelAviv_out": "17:20",
+    "Hayfa_in": "16:07",
+    "Hayfa_out": "17:18",
+    "BeerSheva_in": "16:21",
+    "BeerSheva_out": "17:21"
+  },
+  {
+    "date": "2025-12-26",
+    "parasha": "ויגש",
+    "heb_date": "ז׳ טבת ה'תשפ\"ו",
+    "type": "שבת",
+    "Jerusalem_in": "16:07",
+    "Jerusalem_out": "17:23",
+    "TelAviv_in": "16:21",
+    "TelAviv_out": "17:24",
+    "Hayfa_in": "16:11",
+    "Hayfa_out": "17:21",
+    "BeerSheva_in": "16:25",
+    "BeerSheva_out": "17:25"
+  },
+  {
     "date": "2026-01-02",
     "parasha": "ויחי",
     "heb_date": "י״ד טבת ה'תשפ\"ו",
@@ -26,7 +68,7 @@
     "Hayfa_out": "17:32",
     "BeerSheva_in": "16:35",
     "BeerSheva_out": "17:35"
-  }
+  },
   {
     "date": "2026-01-16",
     "parasha": "וארא",

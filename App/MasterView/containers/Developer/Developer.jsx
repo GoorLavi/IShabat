@@ -1,5 +1,12 @@
-import React, { useMemo, useCallback } from "react";
-import { View, Text, TouchableOpacity, ScrollView, Alert } from "react-native";
+import React, { useMemo, useCallback, useRef, useEffect } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  Clipboard,
+} from "react-native";
 import * as Notifications from "expo-notifications";
 import Icon from "@commonComponents/Icon";
 import { texts } from "./constants";
@@ -8,17 +15,28 @@ import useDeveloper from "@store/developer/developer";
 import useUser from "@store/user/user";
 import useNextEvent from "@store/nextEvent/nextEvent";
 import useReminders from "@store/reminders/reminders";
+import useDevLogs from "@store/devLogs/devLogs";
 import { rescheduleAllNotifications } from "@globals/notificationScheduler";
 import { scheduleNotification } from "@globals/notifications";
 import { getNotificationMessage } from "@globals/notificationMessages";
+import { devLogInfo, devLogError } from "@utils/devLogger";
 
 export default function Developer({ navigation }) {
   const styles = useMemo(() => getStyles(), []);
+  const scrollViewRef = useRef(null);
 
   const { clearOverrides } = useDeveloper();
   const { city, notificationTimes } = useUser();
   const { nextEvent, setTestEvent } = useNextEvent();
   const { resetForNextEvent } = useReminders();
+  const { logs, clearLogs } = useDevLogs();
+
+  // Auto-scroll to bottom when new logs are added
+  useEffect(() => {
+    if (scrollViewRef.current && logs.length > 0) {
+      scrollViewRef.current.scrollToEnd({ animated: true });
+    }
+  }, [logs]);
 
   const onBack = useCallback(
     () => navigation.canGoBack() && navigation.goBack(),
@@ -37,8 +55,8 @@ export default function Developer({ navigation }) {
         return;
       }
 
-      console.log("🧪 Starting Quick Test...");
-      console.log("Current time:", new Date().toISOString());
+      devLogInfo("🧪 Starting Quick Test...");
+      devLogInfo(`Current time: ${new Date().toISOString()}`);
 
       // Calculate times
       const now = Date.now();
@@ -58,12 +76,10 @@ export default function Developer({ navigation }) {
         "0"
       )}:${String(eventOutTime.getMinutes()).padStart(2, "0")}`;
 
-      console.log(
-        `📅 Test times:\n` +
-          `  Notification: ${notificationTime.toISOString()}\n` +
-          `  Event in: ${todayDateString} ${eventTimeString}\n` +
-          `  Event out: ${todayDateString} ${eventOutTimeString}`
-      );
+      devLogInfo("📅 Test times:");
+      devLogInfo(`  Notification: ${notificationTime.toISOString()}`);
+      devLogInfo(`  Event in: ${todayDateString} ${eventTimeString}`);
+      devLogInfo(`  Event out: ${todayDateString} ${eventOutTimeString}`);
 
       // Create test event object
       const testEvent = {
@@ -83,7 +99,7 @@ export default function Developer({ navigation }) {
 
       // Inject test event into the store
       setTestEvent(testEvent);
-      console.log("✅ Test event injected:", testEvent);
+      devLogInfo(`✅ Test event injected: ${JSON.stringify(testEvent)}`);
 
       // Reset todos for this test event
       resetForNextEvent(testEvent.date);
@@ -92,13 +108,15 @@ export default function Developer({ navigation }) {
       const message = getNotificationMessage(
         testEvent.type,
         testEvent.parasha,
-        0.083
+        0.083,
+        notificationTime,
+        eventTime
       ); // 0.083 minutes = 5 seconds
 
-      console.log(
+      devLogInfo(
         `📬 Scheduling notification for: ${notificationTime.toISOString()}`
       );
-      console.log(`📬 Message: ${message.title} - ${message.body}`);
+      devLogInfo(`📬 Message: ${message.title} - ${message.body}`);
 
       const notificationId = await scheduleNotification({
         date: notificationTime,
@@ -106,25 +124,18 @@ export default function Developer({ navigation }) {
         body: message.body,
       });
 
-      console.log(`✅ Notification scheduled with ID: ${notificationId}`);
+      devLogInfo(`✅ Notification scheduled with ID: ${notificationId}`);
 
       // Double check the notification is in the future
       const timeDiff = notificationTime.getTime() - Date.now();
-      console.log(
+      devLogInfo(
         `⏰ Time until notification: ${Math.round(timeDiff / 1000)} seconds`
       );
 
       // Verify it was scheduled
       const allScheduled =
         await Notifications.getAllScheduledNotificationsAsync();
-      console.log(
-        `📅 Total scheduled notifications: ${allScheduled.length}`,
-        allScheduled.map((n) => ({
-          id: n.identifier,
-          trigger: n.trigger,
-          content: n.content.title,
-        }))
-      );
+      devLogInfo(`📅 Total scheduled notifications: ${allScheduled.length}`);
 
       Alert.alert(
         "בדיקה הוצלחה! ✅",
@@ -134,7 +145,7 @@ export default function Developer({ navigation }) {
           `סה"כ ${allScheduled.length} התראות מתוכננות`
       );
     } catch (error) {
-      console.error("❌ Error in handleQuickTest:", error);
+      devLogError(`❌ Error in handleQuickTest: ${error.message}`);
       Alert.alert("שגיאה", `לא ניתן לקבוע התראה: ${error.message}`);
     }
   }, [setTestEvent, resetForNextEvent]);
@@ -155,7 +166,7 @@ export default function Developer({ navigation }) {
 
       Alert.alert("הצלחה", `${count} אירועים תוזמנו מחדש`);
     } catch (error) {
-      console.error("Error resetting:", error);
+      devLogError(`Error resetting: ${error.message}`);
       Alert.alert("שגיאה", "לא ניתן לאפס");
     }
   }, [clearOverrides, city, notificationTimes]);
@@ -163,16 +174,115 @@ export default function Developer({ navigation }) {
   const handleViewScheduled = useCallback(async () => {
     try {
       const scheduled = await Notifications.getAllScheduledNotificationsAsync();
-      console.log("📅 Scheduled Notifications:", scheduled);
+      devLogInfo(`📅 Total scheduled notifications: ${scheduled.length}`);
       Alert.alert(
         "התראות מתוכננות",
-        `נמצאו ${scheduled.length} התראות מתוכננות. בדוק את הקונסול לפרטים.`
+        `נמצאו ${scheduled.length} התראות מתוכננות. בדוק את היומנים לפרטים.`
       );
     } catch (error) {
-      console.error("Error fetching scheduled notifications:", error);
+      devLogError(`Error fetching scheduled notifications: ${error.message}`);
       Alert.alert("שגיאה", "לא ניתן לטעון התראות מתוכננות");
     }
   }, []);
+
+  const handleViewNext = useCallback(async () => {
+    try {
+      const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+
+      if (scheduled.length === 0) {
+        Alert.alert("No Notifications", "No scheduled notifications found");
+        return;
+      }
+
+      // Find the next notification (earliest in future)
+      const now = Date.now();
+      const futureNotifications = scheduled
+        .map((n) => ({
+          ...n,
+          triggerDate:
+            n.trigger?.type === "date" ? new Date(n.trigger.date) : null,
+        }))
+        .filter((n) => n.triggerDate && n.triggerDate.getTime() > now)
+        .sort((a, b) => a.triggerDate.getTime() - b.triggerDate.getTime());
+
+      if (futureNotifications.length === 0) {
+        Alert.alert(
+          "No Future Notifications",
+          "All notifications are in the past"
+        );
+        return;
+      }
+
+      const next = futureNotifications[0];
+      const timeUntil = next.triggerDate.getTime() - now;
+      const minutesUntil = Math.floor(timeUntil / (1000 * 60));
+      const hoursUntil = Math.floor(minutesUntil / 60);
+      const daysUntil = Math.floor(hoursUntil / 24);
+
+      const remainingHours = hoursUntil % 24;
+      const remainingMinutes = minutesUntil % 60;
+
+      let timeFromNow = "";
+      if (daysUntil > 0) {
+        timeFromNow = `${daysUntil}d ${remainingHours}h`;
+      } else if (hoursUntil > 0) {
+        timeFromNow = `${hoursUntil}h ${remainingMinutes}m`;
+      } else {
+        timeFromNow = `${minutesUntil}m`;
+      }
+
+      const readableDate = next.triggerDate.toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      // Log details
+      devLogInfo("=== NEXT NOTIFICATION ===");
+      devLogInfo(`Event: ${next.content.title}`);
+      devLogInfo(`Trigger Date (ISO): ${next.triggerDate.toISOString()}`);
+      devLogInfo(`Trigger Date (Readable): ${readableDate}`);
+      devLogInfo(`Time from now: ${timeFromNow} (${minutesUntil} minutes)`);
+      devLogInfo(`Notification ID: ${next.identifier}`);
+
+      // Show alert
+      Alert.alert(
+        "Next Notification",
+        `Event: ${next.content.title}\n\n` +
+          `Fires at: ${readableDate}\n\n` +
+          `Time from now: ${timeFromNow}\n` +
+          `(${minutesUntil} minutes)\n\n` +
+          `ID: ${next.identifier.substring(0, 16)}...`
+      );
+    } catch (error) {
+      devLogError(`Error viewing next notification: ${error.message}`);
+      Alert.alert("Error", "Failed to load next notification");
+    }
+  }, []);
+
+  const handleCopyAllLogs = useCallback(() => {
+    try {
+      if (logs.length === 0) {
+        Alert.alert("No Logs", "There are no logs to copy");
+        return;
+      }
+
+      // Format logs as plain text
+      const formattedLogs = logs
+        .map(
+          (log) =>
+            `[${log.timestamp}] ${log.level.toUpperCase()}: ${log.message}`
+        )
+        .join("\n");
+
+      Clipboard.setString(formattedLogs);
+      Alert.alert("Success", `Copied ${logs.length} log entries to clipboard`);
+    } catch (error) {
+      Alert.alert("Error", "Failed to copy logs to clipboard");
+    }
+  }, [logs]);
 
   const currentParasha = nextEvent?.parasha || "---";
   const currentDate = nextEvent?.date || "---";
@@ -241,10 +351,72 @@ export default function Developer({ navigation }) {
           </TouchableOpacity>
 
           <TouchableOpacity
+            style={[styles.actionButton, styles.actionButtonSecondary]}
+            onPress={handleViewNext}
+          >
+            <Text style={styles.actionButtonText}>{texts.VIEW_NEXT}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={[styles.actionButton, styles.actionButtonDanger]}
             onPress={handleResetAll}
           >
             <Text style={styles.actionButtonText}>{texts.CLEAR_OVERRIDES}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Logs Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionHeader}>{texts.LOGS_SECTION}</Text>
+
+          <View style={styles.logsWrapper}>
+            <ScrollView
+              ref={scrollViewRef}
+              style={styles.logsContainer}
+              nestedScrollEnabled={true}
+            >
+              {logs.length === 0 ? (
+                <Text style={styles.logEmpty}>No logs yet</Text>
+              ) : (
+                logs.map((log) => (
+                  <View key={log.id} style={styles.logEntry}>
+                    <Text style={styles.logTimestamp}>[{log.timestamp}]</Text>
+                    <Text
+                      style={[
+                        styles.logLevel,
+                        log.level === "error" && styles.logLevelError,
+                        log.level === "warn" && styles.logLevelWarn,
+                      ]}
+                    >
+                      {log.level.toUpperCase()}
+                    </Text>
+                    <Text style={styles.logMessage}>{log.message}</Text>
+                  </View>
+                ))
+              )}
+            </ScrollView>
+
+            {logs.length > 0 && (
+              <TouchableOpacity
+                style={styles.copyAllButton}
+                onPress={handleCopyAllLogs}
+              >
+                <Icon
+                  family="MaterialIcons"
+                  name="content-copy"
+                  size={16}
+                  color="#FFFFFF"
+                />
+                <Text style={styles.copyAllButtonText}>Copy All</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          <TouchableOpacity
+            style={[styles.actionButton, styles.actionButtonSecondary]}
+            onPress={clearLogs}
+          >
+            <Text style={styles.actionButtonText}>{texts.CLEAR_LOGS}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

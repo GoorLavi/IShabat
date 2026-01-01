@@ -5,6 +5,7 @@
     "start-fresh": "npx expo start -c",
     "android": "npx expo start --android",
     "ios": "npx expo start --ios",
+    "run:ios": "npx expo run:ios",
     "web": "npx expo start --web",
     "build:ios:dev": "eas build -p ios --profile development",
     "build:android:dev": "eas build -p android --profile development",
@@ -40,6 +41,7 @@
     "react-native-screens": "~4.16.0",
     "react-native-vector-icons": "^7.1.0",
     "react-native-web": "^0.21.0",
+    "xlsx": "^0.18.5",
     "zustand": "^3.6.8"
   },
   "devDependencies": {

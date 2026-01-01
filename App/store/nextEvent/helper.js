@@ -1,28 +1,38 @@
 import events from "./events.json";
+import { createEventDate } from "@globals/utils";
 
-export const findComingEvents = () => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+export const findComingEvents = (city) => {
+  const now = new Date();
 
   return events.filter((e) => {
-    const eventDate = new Date(e.date);
-    eventDate.setDate(eventDate.getDate() - 1);
-    eventDate.setHours(0, 0, 0, 0);
-    return eventDate.getTime() >= today.getTime();
+    const eventTime = e[`${city}_in`];
+
+    if (!eventTime || eventTime === "---") return false;
+
+    const eventDateTime = createEventDate(e.date, eventTime);
+    return eventDateTime.getTime() > now.getTime();
   });
 };
 
-export const findNextEvent = () => {
-  return findComingEvents()?.[0];
+export const findNextEvent = (city) => {
+  return findComingEvents(city)?.[0];
 };
 
-export const findPastEvents = () => {
-  const current = new Date().getTime();
-  return events.filter((e) => new Date(e.date).getTime() - current <= 0);
+export const findPastEvents = (city) => {
+  const now = new Date();
+
+  return events.filter((e) => {
+    const eventTime = e[`${city}_in`];
+
+    if (!eventTime || eventTime === "---") return false;
+
+    const eventDateTime = createEventDate(e.date, eventTime);
+    return eventDateTime.getTime() <= now.getTime();
+  });
 };
 
-export const findLastPastEvent = () => {
-  const pastEvents = findPastEvents();
+export const findLastPastEvent = (city) => {
+  const pastEvents = findPastEvents(city);
   return pastEvents[pastEvents.length - 1]; // Last event in past events array
 };
 

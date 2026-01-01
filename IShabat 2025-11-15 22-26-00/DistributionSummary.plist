@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IShabat.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>arm64</string>
+			</array>
+			<key>buildNumber</key>
+			<string>1</string>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>D1593AF45D4DECAAD1919DF0F3411958E25AD1C0</string>
+				<key>dateExpires</key>
+				<string>13/11/2026</string>
+				<key>type</key>
+				<string>Cloud Managed Apple Distribution</string>
+			</dict>
+			<key>embeddedBinaries</key>
+			<array>
+				<dict>
+					<key>architectures</key>
+					<array>
+						<string>arm64</string>
+					</array>
+					<key>buildNumber</key>
+					<string>1</string>
+					<key>certificate</key>
+					<dict>
+						<key>SHA1</key>
+						<string>D1593AF45D4DECAAD1919DF0F3411958E25AD1C0</string>
+						<key>dateExpires</key>
+						<string>13/11/2026</string>
+						<key>type</key>
+						<string>Cloud Managed Apple Distribution</string>
+					</dict>
+					<key>name</key>
+					<string>React.framework</string>
+					<key>symbols</key>
+					<true/>
+					<key>team</key>
+					<dict>
+						<key>id</key>
+						<string>J3AJ7T4PR4</string>
+						<key>name</key>
+						<string>Goor Lavi</string>
+					</dict>
+					<key>versionNumber</key>
+					<string>1.0</string>
+				</dict>
+				<dict>
+					<key>architectures</key>
+					<array>
+						<string>arm64</string>
+					</array>
+					<key>buildNumber</key>
+					<string>1</string>
+					<key>certificate</key>
+					<dict>
+						<key>SHA1</key>
+						<string>D1593AF45D4DECAAD1919DF0F3411958E25AD1C0</string>
+						<key>dateExpires</key>
+						<string>13/11/2026</string>
+						<key>type</key>
+						<string>Cloud Managed Apple Distribution</string>
+					</dict>
+					<key>name</key>
+					<string>ReactNativeDependencies.framework</string>
+					<key>symbols</key>
+					<true/>
+					<key>team</key>
+					<dict>
+						<key>id</key>
+						<string>J3AJ7T4PR4</string>
+						<key>name</key>
+						<string>Goor Lavi</string>
+					</dict>
+					<key>versionNumber</key>
+					<string>1.0</string>
+				</dict>
+				<dict>
+					<key>architectures</key>
+					<array>
+						<string>arm64</string>
+					</array>
+					<key>buildNumber</key>
+					<string>0.12.0</string>
+					<key>certificate</key>
+					<dict>
+						<key>SHA1</key>
+						<string>D1593AF45D4DECAAD1919DF0F3411958E25AD1C0</string>
+						<key>dateExpires</key>
+						<string>13/11/2026</string>
+						<key>type</key>
+						<string>Cloud Managed Apple Distribution</string>
+					</dict>
+					<key>name</key>
+					<string>hermes.framework</string>
+					<key>symbols</key>
+					<true/>
+					<key>team</key>
+					<dict>
+						<key>id</key>
+						<string>J3AJ7T4PR4</string>
+						<key>name</key>
+						<string>Goor Lavi</string>
+					</dict>
+					<key>versionNumber</key>
+					<string>0.12.0</string>
+				</dict>
+			</array>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>J3AJ7T4PR4.com.goorl.IShabat</string>
+				<key>aps-environment</key>
+				<string>production</string>
+				<key>beta-reports-active</key>
+				<true/>
+				<key>com.apple.developer.team-identifier</key>
+				<string>J3AJ7T4PR4</string>
+				<key>get-task-allow</key>
+				<false/>
+			</dict>
+			<key>name</key>
+			<string>IShabat.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>dd0b024f-dfe1-4d48-ac6f-2e7d34188654</string>
+				<key>dateExpires</key>
+				<string>13/11/2026</string>
+				<key>name</key>
+				<string>iOS Team Store Provisioning Profile: com.goorl.IShabat</string>
+			</dict>
+			<key>symbols</key>
+			<true/>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>J3AJ7T4PR4</string>
+				<key>name</key>
+				<string>Goor Lavi</string>
+			</dict>
+			<key>versionNumber</key>
+			<string>1.0.12</string>
+		</dict>
+	</array>
+</dict>
+</plist>

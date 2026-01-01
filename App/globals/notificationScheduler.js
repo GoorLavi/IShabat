@@ -1,78 +1,59 @@
 import { cancelAllNotifications, setEvent } from "./notifications";
 import { findComingEvents } from "@store/nextEvent/helper";
 import { getEffectiveNotificationTimes } from "./devOverrides";
-import useDeveloper from "@store/developer/developer";
+import useReminders from "@store/reminders/reminders";
+import { createEventDate } from "./utils";
+import { devLogInfo, devLogWarn, devLogError } from "@utils/devLogger";
 
 /**
- * Reschedule all notifications based on current mode (dev or normal)
+ * Reschedule all notifications
  * @param {string} city - User's city
  * @param {Array<number>} notificationTimes - User's notification times
- * @param {boolean} areAllTodosCompleted - Whether all todos are completed
- * @param {boolean} forceAllEvents - Force schedule all events even in dev mode
  * @returns {Promise<number>} - Number of events scheduled
  */
-export const rescheduleAllNotifications = async (
-  city,
-  notificationTimes,
-  areAllTodosCompleted,
-  forceAllEvents = false
-) => {
+export const rescheduleAllNotifications = async (city, notificationTimes) => {
   try {
-    console.log("🔄 Rescheduling all notifications...");
+    devLogInfo("🔄 Rescheduling all notifications...");
 
     // Cancel all existing notifications
     await cancelAllNotifications();
 
-    // Get all coming events
-    const events = findComingEvents();
+    // Get all coming events for the user's city
+    const events = findComingEvents(city);
 
-    // Check if dev mode is active
-    const { isDevMode } = useDeveloper.getState();
-
-    // In dev mode, only schedule first event (unless forceAllEvents is true)
-    // In normal mode, schedule all events
-    const eventsToSchedule = (isDevMode && !forceAllEvents) ? events.slice(0, 1) : events;
-
-    if (forceAllEvents && isDevMode) {
-      console.log(
-        `🔧 DEV: Force scheduling all ${eventsToSchedule.length} events (dev mode with forceAllEvents)`
-      );
-    } else if (isDevMode) {
-      console.log(
-        `🔧 DEV: Only scheduling ${eventsToSchedule.length} event (dev mode)`
-      );
-    } else {
-      console.log(`✅ Scheduling ${eventsToSchedule.length} events (normal mode)`);
-    }
+    devLogInfo(`Found ${events?.length} events in JSON file`);
 
     // Get effective notification times (with dev overrides if applicable)
     const effectiveTimes = getEffectiveNotificationTimes(notificationTimes);
 
+    // Check if all todos are completed
+    const { areAllCompleted } = useReminders.getState();
+    const allComplete = areAllCompleted();
+
     // Schedule all appropriate events
-    for (const event of eventsToSchedule) {
+    for (const event of events) {
       const { date, type } = event;
       const eventInTime = event[`${city}_in`];
 
       if (!eventInTime || eventInTime === "---") {
-        console.warn(`Skipping event without entrance time: ${date}`);
+        devLogWarn(`Skipping event without entrance time: ${date}`);
         continue;
       }
 
       await setEvent({
         type,
-        date: new Date(`${date}T${eventInTime}`),
+        date: createEventDate(date, eventInTime),
         notificationTimes: effectiveTimes,
-        areAllTodosCompleted,
+        areAllTodosCompleted: allComplete,
         event,
         city,
       });
     }
 
-    console.log(`✅ Successfully scheduled ${eventsToSchedule.length} events`);
-    return eventsToSchedule.length;
+    devLogInfo(`✅ Successfully scheduled ${events.length} events`);
+    return events.length;
   } catch (error) {
-    console.error("Error in rescheduleAllNotifications:", error);
+    devLogError(`Error in rescheduleAllNotifications: ${error.message}`);
     throw error;
   }
 };
-

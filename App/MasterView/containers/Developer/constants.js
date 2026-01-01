@@ -6,9 +6,12 @@ export const texts = {
   QUICK_ACTIONS_SECTION: "פעולות מהירות",
   FORCE_RESCHEDULE: "אלץ תזמון מחדש של התראות",
   CLEAR_OVERRIDES: "נקה עקיפות ותזמן מחדש הכל",
-  VIEW_SCHEDULED: "הצג התראות מתוכננות (קונסול)",
+  VIEW_SCHEDULED: "הצג התראות מתוכננות",
+  VIEW_NEXT: "הצג התראה הבאה",
   CURRENT_EVENT_INFO: "אירוע נוכחי:",
   PARASHA_LABEL: "פרשה:",
   DATE_LABEL: "תאריך:",
   TIME_LABEL: "זמן כניסה:",
+  LOGS_SECTION: "יומני מערכת",
+  CLEAR_LOGS: "נקה יומנים",
 };

@@ -2,6 +2,7 @@ import * as Notifications from "expo-notifications";
 import StorageService from "@services/storageService";
 import { getEffectiveEventTime, getEffectiveEventDate } from "./devOverrides";
 import { getNotificationMessage, getTimeText } from "./notificationMessages";
+import { devLogInfo, devLogWarn, devLogError } from "@utils/devLogger";
 
 export const notificationInitializedKey = "is-notifications-initialized";
 
@@ -20,7 +21,7 @@ const identifier = "shabat";
  * @param {Object} params - Notification parameters
  * @param {Date} params.date - The event date/time
  * @param {string} params.type - Event type ('שבת', 'חג', 'שבת חג')
- * @param {number[]} [params.notificationTimes=[40, 20]] - Minutes before event to schedule notifications
+ * @param {number[]} [params.notificationTimes=[0.5, 1]] - Minutes before event to schedule notifications
  * @param {boolean} [params.areAllTodosCompleted=false] - If true, skips notifications
  * @param {Object} [params.event] - The full event object for dev overrides
  * @param {string} [params.city] - User's city for dev overrides
@@ -29,7 +30,7 @@ const identifier = "shabat";
 export const setEvent = async ({
   date,
   type,
-  notificationTimes = [40, 20],
+  notificationTimes = [0.5, 1],
   areAllTodosCompleted = false,
   event = null,
   city = null,
@@ -37,9 +38,7 @@ export const setEvent = async ({
   try {
     // If all todos are completed, skip scheduling notifications
     if (areAllTodosCompleted) {
-      console.log(
-        "All todos completed - skipping notifications for this event"
-      );
+      devLogInfo("All todos completed - skipping notifications for this event");
       return;
     }
 
@@ -60,14 +59,14 @@ export const setEvent = async ({
         const finalDateStr = effectiveDateStr || event.date;
         const finalTime = effectiveTime || event[`${city}_in`];
         effectiveDate = new Date(`${finalDateStr}T${finalTime}`);
-        console.log(
+        devLogInfo(
           `🔧 DEV: Using overridden event - Date: ${finalDateStr}, Time: ${finalTime} => ${effectiveDate.toISOString()}`
         );
       }
     }
 
     if (!effectiveDate || !(effectiveDate instanceof Date)) {
-      console.error("Invalid date provided to setEvent");
+      devLogError("Invalid date provided to setEvent");
       return;
     }
 
@@ -84,32 +83,40 @@ export const setEvent = async ({
 
           // Skip if notification time is in the past
           if (notificationDate.getTime() <= Date.now()) {
-            console.warn(
+            devLogWarn(
               `Notification time ${minutes} minutes before event is in the past, skipping`
             );
             continue;
           }
 
           // Use common message function for consistency
-          const message = getNotificationMessage(type, parasha, minutes);
+          const message = getNotificationMessage(
+            type,
+            parasha,
+            minutes,
+            notificationDate,
+            effectiveDate
+          );
+
+          const eventDateTime = effectiveDate.toISOString();
 
           await scheduleNotification({
             date: notificationDate,
             title: message.title,
             groupName: identifier,
             body: message.body,
+            eventDateTime,
           });
         } catch (error) {
-          console.error(
-            `Failed to schedule notification ${minutes} minutes before event:`,
-            error
+          devLogError(
+            `Failed to schedule notification ${minutes} minutes before event: ${error.message}`
           );
           // Continue with next notification even if one fails
         }
       }
     }
   } catch (error) {
-    console.error("Error in setEvent:", error);
+    devLogError(`Error in setEvent: ${error.message}`);
   }
 };
 
@@ -119,9 +126,15 @@ export const setEvent = async ({
  * @param {Date} params.date - When to show the notification
  * @param {string} params.title - Notification title
  * @param {string} params.body - Notification body text
+ * @param {string} params.eventDateTime - Event date+time (ISO string) for identification
  * @returns {Promise<string>} Notification identifier
  */
-export const scheduleNotification = async ({ date, title, body }) => {
+export const scheduleNotification = async ({
+  date,
+  title,
+  body,
+  eventDateTime,
+}) => {
   try {
     if (!date || !(date instanceof Date)) {
       throw new Error("Invalid date provided to scheduleNotification");
@@ -135,6 +148,7 @@ export const scheduleNotification = async ({ date, title, body }) => {
         categoryIdentifier: identifier,
         data: {
           date,
+          eventDateTime,
         },
         // Android only
         vibrationPattern: [0, 250, 250, 250],
@@ -142,20 +156,74 @@ export const scheduleNotification = async ({ date, title, body }) => {
       trigger: { type: "date", date },
     });
 
+    devLogInfo(`Notification scheduled with ID: ${notificationId}`);
+
     return notificationId;
   } catch (error) {
-    console.error("Error scheduling notification:", error);
+    devLogError(`Error scheduling notification: ${error.message}`);
     throw error;
   }
 };
 
-export const getAllNotifications = async () => {
+export const printAllExistingNotifications = async () => {
   const notifications = await Notifications.getAllScheduledNotificationsAsync();
-  console.log({ notifications });
+
+  devLogInfo(`Total scheduled notifications: ${notifications.length}`);
+
+  notifications.forEach((notification, index) => {
+    const trigger = notification.trigger;
+    const content = notification.content;
+    const triggerDate =
+      trigger?.type === "date" ? new Date(trigger.date) : null;
+
+    if (triggerDate) {
+      const now = Date.now();
+      const timeUntil = triggerDate.getTime() - now;
+      const minutesUntil = Math.floor(timeUntil / (1000 * 60));
+
+      devLogInfo(`Notification ${index + 1}:`);
+      devLogInfo(`  ID: ${notification.identifier}`);
+      devLogInfo(`  Title: ${content.title}`);
+      devLogInfo(`  Fires at: ${triggerDate.toISOString()}`);
+      devLogInfo(`  Time from now: ${minutesUntil} minutes`);
+    }
+  });
 };
 
 export const cancelAllNotifications = async () => {
   await Notifications.cancelAllScheduledNotificationsAsync();
+};
+
+/**
+ * Cancel notifications for a specific event
+ * @param {string} eventDateTime - Event date+time (ISO string) to match
+ * @returns {Promise<number>} Number of notifications cancelled
+ */
+export const cancelNotificationsForEvent = async (eventDateTime) => {
+  try {
+    const allNotifications =
+      await Notifications.getAllScheduledNotificationsAsync();
+    let cancelledCount = 0;
+
+    for (const notification of allNotifications) {
+      const notificationEventDateTime =
+        notification.content?.data?.eventDateTime;
+      if (notificationEventDateTime === eventDateTime) {
+        await Notifications.cancelScheduledNotificationAsync(
+          notification.identifier
+        );
+        cancelledCount++;
+      }
+    }
+
+    devLogInfo(
+      `Cancelled ${cancelledCount} notifications for event ${eventDateTime}`
+    );
+    return cancelledCount;
+  } catch (error) {
+    devLogError(`Error cancelling notifications for event: ${error.message}`);
+    throw error;
+  }
 };
 
 export const getPermission = async () => {

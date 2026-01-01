@@ -4,15 +4,23 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
-      "@styles/*": "./App/styles/*",
-      "@store/*": "./App/store/*",
-      "@store": "./App/store",
-      "@globals/*": "./App/globals/*",
-      "@commonComponents/*": "./commonComponents/*",
-      "@services/*": "./App/services/*",
-      "@formSchemas/*": "./App/formSchemas/*",
-      "@prototypes": "./prototypes",
-      "@assets/*": "./App/assets/*"
+      "@styles/*": ["./App/styles/*"],
+      "@styles": ["./App/styles"],
+      "@store/*": ["./App/store/*"],
+      "@store": ["./App/store"],
+      "@globals/*": ["./App/globals/*"],
+      "@globals": ["./App/globals"],
+      "@commonComponents/*": ["./commonComponents/*"],
+      "@commonComponents": ["./commonComponents"],
+      "@services/*": ["./App/services/*"],
+      "@services": ["./App/services"],
+      "@formSchemas/*": ["./App/formSchemas/*"],
+      "@formSchemas": ["./App/formSchemas"],
+      "@prototypes": ["./prototypes"],
+      "@assets/*": ["./App/assets/*"],
+      "@assets": ["./App/assets"],
+      "@utils/*": ["./App/utils/*"],
+      "@utils": ["./App/utils"]
     }
   },
   "exclude": [

@@ -16,6 +16,7 @@ import useNextEvent from "@store/nextEvent/nextEvent";
 import useDeveloper from "@store/developer/developer";
 import { scheduleNotification } from "@globals/notifications";
 import { getNotificationMessage } from "@globals/notificationMessages";
+import { devLogError } from "@utils/devLogger";
 
 import ContactUsButton from "./containers/ContactUsButton/ContactUsButton";
 
@@ -53,8 +54,8 @@ export default function Settings({ navigation }) {
   }, [lastTapTime, isDevMode, setDevMode]);
 
   const handleSave = useCallback(() => {
-    const first = parseInt(firstNotification, 10);
-    const second = parseInt(secondNotification, 10);
+    const first = parseFloat(firstNotification);
+    const second = parseFloat(secondNotification);
 
     if (isNaN(first) || isNaN(second) || first <= 0 || second <= 0) {
       Alert.alert("שגיאה", "נא להזין מספרים חיוביים בלבד");
@@ -71,33 +72,6 @@ export default function Settings({ navigation }) {
     setCity,
     setNotificationTimes,
   ]);
-
-  const handleTestNotification = useCallback(async () => {
-    try {
-      if (!nextEvent) {
-        Alert.alert("שגיאה", "אין אירוע קרוב להצגה");
-        return;
-      }
-
-      const testDate = new Date();
-      testDate.setSeconds(testDate.getSeconds() + 5);
-
-      // Use common message function with 1 minute (closest to 5 seconds for display)
-      const { type, parasha } = nextEvent;
-      const message = getNotificationMessage(type, parasha, 1);
-
-      await scheduleNotification({
-        date: testDate,
-        title: message.title,
-        body: message.body,
-      });
-
-      Alert.alert("הצלחה", "התראה נקבעה לעוד 5 שניות");
-    } catch (error) {
-      console.error("Error scheduling test notification:", error);
-      Alert.alert("שגיאה", "לא ניתן לקבוע התראה לבדיקה");
-    }
-  }, [nextEvent]);
 
   return (
     <View {...{ style: styles.container }}>

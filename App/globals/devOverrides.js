@@ -1,4 +1,5 @@
 import useDeveloper from "@store/developer/developer";
+import { devLogInfo } from "@utils/devLogger";
 
 /**
  * Check if developer mode is active
@@ -22,7 +23,7 @@ export const getEffectiveEventTime = (event, city) => {
 
   // Return override if dev mode is on and override is set
   if (isDevMode && eventTimeOverride) {
-    console.log(
+    devLogInfo(
       `🔧 DEV: Using override time ${eventTimeOverride} instead of ${
         event[`${city}_in`]
       }`
@@ -44,7 +45,7 @@ export const getEffectiveNotificationTimes = (userTimes) => {
 
   // Return override if dev mode is on and override is set
   if (isDevMode && notificationTestTimes && notificationTestTimes.length > 0) {
-    console.log(
+    devLogInfo(
       `🔧 DEV: Using override notification times [${notificationTestTimes.join(
         ", "
       )}] instead of [${userTimes.join(", ")}]`
@@ -68,7 +69,7 @@ export const getEffectiveEventDate = (event) => {
 
   // Return override if dev mode is on and override is set
   if (isDevMode && eventDateOverride) {
-    console.log(
+    devLogInfo(
       `🔧 DEV: Using override date ${eventDateOverride} instead of ${event.date}`
     );
     return eventDateOverride;

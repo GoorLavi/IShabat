@@ -9,8 +9,12 @@ import AddTask from "./components/AddTask/AddTask";
 export default function ReminderList({ scrollViewRef }) {
   const styles = getStyles();
 
-  const { reminders, addReminder, setReminder, removeReminder } =
-    useReminders();
+  const {
+    todos,
+    addTodo: addReminder,
+    setTodo: setReminder,
+    removeTodo: removeReminder,
+  } = useReminders();
 
   const handleAddTask = useCallback(
     (taskText) => {
@@ -29,11 +33,11 @@ export default function ReminderList({ scrollViewRef }) {
 
   return (
     <View {...{ style: styles.RemindersList }}>
-      {!!reminders?.length && (
+      {!!todos?.length && (
         <View style={styles.RemindersContent}>
           <Text style={styles.RemindersHeader}>{texts.REMINDERS_HEADER}</Text>
           <View style={styles.List}>
-            {reminders.map((reminder, index) => (
+            {todos.map((reminder, index) => (
               <Reminder
                 key={reminder.id}
                 {...{ reminder, setReminder, removeReminder, scrollViewRef }}

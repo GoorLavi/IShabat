@@ -5,64 +5,56 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default create(
   persist(
     (set, get) => ({
-      reminders: [],
-      lastEventId: null, // Track which event the todos belong to
-      addReminder: (initialValue = "") => {
-        const newReminder = {
+      todos: [],
+      lastEventDateTime: null, // Track which event these todos belong to
+      addTodo: (initialValue = "") => {
+        const newTodo = {
           id: String.random(),
           value: initialValue,
           checked: false,
           isNew: initialValue === "",
         };
         set({
-          reminders: [...(get().reminders || []), newReminder],
+          todos: [...(get().todos || []), newTodo],
         });
-        return newReminder;
+        return newTodo;
       },
-      setReminder: ({ isNew, ...reminder }) => {
+      setTodo: ({ isNew, ...todo }) => {
         set({
-          reminders: get().reminders.map((r) =>
-            r.id === reminder.id ? reminder : r
-          ),
+          todos: get().todos.map((t) => (t.id === todo.id ? todo : t)),
         });
       },
-      removeReminder: (id) =>
-        set({ reminders: get().reminders.filter((r) => r.id !== id) }),
+      removeTodo: (id) =>
+        set({ todos: get().todos.filter((t) => t.id !== id) }),
 
-      // Check if all reminders are completed (checked)
+      // Check if all todos are completed (checked)
       areAllCompleted: () => {
-        const reminders = get().reminders;
-        if (!reminders || reminders.length === 0) {
-          return false; // No reminders means not complete
+        const todos = get().todos;
+        if (!todos || todos.length === 0) {
+          return false; // No todos means not complete
         }
-        return reminders.every((r) => r.checked === true);
+        return todos.every((t) => t.checked === true);
       },
 
-      // Uncheck all reminders for the next event
+      // Uncheck all todos for the next event
       uncheckAll: () => {
-        const reminders = get().reminders;
+        const todos = get().todos;
         set({
-          reminders: reminders.map((r) => ({ ...r, checked: false })),
+          todos: todos.map((t) => ({ ...t, checked: false })),
         });
       },
 
       // Reset todos for next event
-      resetForNextEvent: (eventId) => {
-        const currentEventId = get().lastEventId;
-        if (currentEventId !== eventId) {
-          // New event - uncheck all todos
+      resetForNextEvent: (eventDateTime) => {
+        const currentEventDateTime = get().lastEventDateTime;
+        if (currentEventDateTime !== eventDateTime) {
           get().uncheckAll();
-          set({ lastEventId: eventId });
+          set({ lastEventDateTime: eventDateTime });
         }
-      },
-
-      // Update lastEventId
-      setLastEventId: (eventId) => {
-        set({ lastEventId: eventId });
       },
     }),
     {
-      name: "reminders",
+      name: "todos",
       getStorage: () => AsyncStorage,
     }
   )

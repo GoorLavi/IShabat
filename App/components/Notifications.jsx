@@ -1,16 +1,15 @@
 import { useEffect } from "react";
 import {
-  getAllNotifications,
+  printAllExistingNotifications,
   isNotificationPermissionGranted,
-  isNotificationInitialized,
   askPermission,
-  setNotificationInitialized,
 } from "@globals/notifications";
 import { rescheduleAllNotifications } from "@globals/notificationScheduler";
 import useUser from "@store/user/user";
 import useReminders from "@store/reminders/reminders";
 import useNextEvent from "@store/nextEvent/nextEvent";
 import useDeveloper from "@store/developer/developer";
+import { devLogInfo } from "@utils/devLogger";
 
 export default () => {
   const { city, notificationTimes } = useUser();
@@ -25,27 +24,32 @@ export default () => {
 
   useEffect(() => {
     (async () => {
-      await getAllNotifications();
+      devLogInfo("Initializing notifications");
+      await printAllExistingNotifications();
 
-      const initialized = await isNotificationInitialized();
+      // const initialized = await isNotificationInitialized();
 
       let isPermissionGranted = await isNotificationPermissionGranted();
 
       if (!isPermissionGranted) {
         isPermissionGranted = await askPermission();
 
-        console.log({ isPermissionGranted });
+        devLogInfo(`Permission granted: ${isPermissionGranted}`);
         if (!isPermissionGranted) {
           alert("האפליקציה צריכה אישור להשתמש בהתראות");
           return;
         }
       }
 
-      if (!initialized) {
-        const allCompleted = areAllCompleted();
-        await rescheduleAllNotifications(city, notificationTimes, allCompleted);
-        await setNotificationInitialized(true);
-      }
+      // Always reschedule when dependencies change, not just on initial setup
+      const allCompleted = areAllCompleted();
+      devLogInfo(`All todos completed: ${allCompleted}`);
+      await rescheduleAllNotifications(city, notificationTimes, allCompleted);
+
+      // Only set initialized flag on first run
+      // if (!initialized) {
+      //   await setNotificationInitialized(true);
+      // }
     })();
   }, [
     city,
