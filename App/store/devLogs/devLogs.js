@@ -1,6 +1,6 @@
 import create from "zustand";
 
-const MAX_LOGS = 200; // Keep last 200 logs
+const MAX_LOGS = 1000; // Keep last 1000 logs
 
 export default create((set, get) => ({
   logs: [],
