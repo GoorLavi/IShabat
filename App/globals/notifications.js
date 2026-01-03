@@ -2,6 +2,7 @@ import * as Notifications from "expo-notifications";
 import StorageService from "@services/storageService";
 import { getEffectiveEventTime, getEffectiveEventDate } from "./devOverrides";
 import { getNotificationMessage, getTimeText } from "./notificationMessages";
+import { parseNotificationTriggerDate } from "./utils";
 import { devLogInfo, devLogWarn, devLogError } from "@utils/devLogger";
 
 export const notificationInitializedKey = "is-notifications-initialized";
@@ -140,6 +141,9 @@ export const scheduleNotification = async ({
       throw new Error("Invalid date provided to scheduleNotification");
     }
 
+    const fireDateISO = date.toISOString();
+    const scheduledAt = new Date().toISOString();
+
     const notificationId = await Notifications.scheduleNotificationAsync({
       content: {
         title,
@@ -149,6 +153,8 @@ export const scheduleNotification = async ({
         data: {
           date,
           eventDateTime,
+          fireDateISO,
+          scheduledAt,
         },
         // Android only
         vibrationPattern: [0, 250, 250, 250],
@@ -171,10 +177,7 @@ export const printAllExistingNotifications = async () => {
   devLogInfo(`Total scheduled notifications: ${notifications.length}`);
 
   notifications.forEach((notification, index) => {
-    const trigger = notification.trigger;
-    const content = notification.content;
-    const triggerDate =
-      trigger?.type === "date" ? new Date(trigger.date) : null;
+    const triggerDate = parseNotificationTriggerDate(notification);
 
     if (triggerDate) {
       const now = Date.now();
@@ -183,7 +186,7 @@ export const printAllExistingNotifications = async () => {
 
       devLogInfo(`Notification ${index + 1}:`);
       devLogInfo(`  ID: ${notification.identifier}`);
-      devLogInfo(`  Title: ${content.title}`);
+      devLogInfo(`  Title: ${notification.content.title}`);
       devLogInfo(`  Fires at: ${triggerDate.toISOString()}`);
       devLogInfo(`  Time from now: ${minutesUntil} minutes`);
     }

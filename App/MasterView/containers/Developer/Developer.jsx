@@ -19,6 +19,7 @@ import useDevLogs from "@store/devLogs/devLogs";
 import { rescheduleAllNotifications } from "@globals/notificationScheduler";
 import { scheduleNotification } from "@globals/notifications";
 import { getNotificationMessage } from "@globals/notificationMessages";
+import { getNextScheduledNotification } from "@globals/utils";
 import { devLogInfo, devLogError } from "@utils/devLogger";
 
 export default function Developer({ navigation }) {
@@ -175,6 +176,8 @@ export default function Developer({ navigation }) {
     try {
       const scheduled = await Notifications.getAllScheduledNotificationsAsync();
       devLogInfo(`📅 Total scheduled notifications: ${scheduled.length}`);
+
+      devLogInfo(JSON.stringify(scheduled, null, 2));
       Alert.alert(
         "התראות מתוכננות",
         `נמצאו ${scheduled.length} התראות מתוכננות. בדוק את היומנים לפרטים.`
@@ -187,74 +190,36 @@ export default function Developer({ navigation }) {
 
   const handleViewNext = useCallback(async () => {
     try {
-      const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+      const result = await getNextScheduledNotification();
 
-      if (scheduled.length === 0) {
-        Alert.alert("No Notifications", "No scheduled notifications found");
-        return;
-      }
-
-      // Find the next notification (earliest in future)
-      const now = Date.now();
-      const futureNotifications = scheduled
-        .map((n) => ({
-          ...n,
-          triggerDate:
-            n.trigger?.type === "date" ? new Date(n.trigger.date) : null,
-        }))
-        .filter((n) => n.triggerDate && n.triggerDate.getTime() > now)
-        .sort((a, b) => a.triggerDate.getTime() - b.triggerDate.getTime());
-
-      if (futureNotifications.length === 0) {
+      if (!result.success) {
         Alert.alert(
-          "No Future Notifications",
-          "All notifications are in the past"
+          result.message.includes("past")
+            ? "No Future Notifications"
+            : "No Notifications",
+          result.message
         );
         return;
       }
 
-      const next = futureNotifications[0];
-      const timeUntil = next.triggerDate.getTime() - now;
-      const minutesUntil = Math.floor(timeUntil / (1000 * 60));
-      const hoursUntil = Math.floor(minutesUntil / 60);
-      const daysUntil = Math.floor(hoursUntil / 24);
-
-      const remainingHours = hoursUntil % 24;
-      const remainingMinutes = minutesUntil % 60;
-
-      let timeFromNow = "";
-      if (daysUntil > 0) {
-        timeFromNow = `${daysUntil}d ${remainingHours}h`;
-      } else if (hoursUntil > 0) {
-        timeFromNow = `${hoursUntil}h ${remainingMinutes}m`;
-      } else {
-        timeFromNow = `${minutesUntil}m`;
-      }
-
-      const readableDate = next.triggerDate.toLocaleString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-
       // Log details
       devLogInfo("=== NEXT NOTIFICATION ===");
-      devLogInfo(`Event: ${next.content.title}`);
-      devLogInfo(`Trigger Date (ISO): ${next.triggerDate.toISOString()}`);
-      devLogInfo(`Trigger Date (Readable): ${readableDate}`);
-      devLogInfo(`Time from now: ${timeFromNow} (${minutesUntil} minutes)`);
-      devLogInfo(`Notification ID: ${next.identifier}`);
+      devLogInfo(`Event: ${result.title}`);
+      devLogInfo(`Trigger Date (ISO): ${result.triggerDate.toISOString()}`);
+      devLogInfo(`Trigger Date (Readable): ${result.readableDate}`);
+      devLogInfo(
+        `Time from now: ${result.compactTime} (${result.minutesUntil} minutes)`
+      );
+      devLogInfo(`Notification ID: ${result.identifier}`);
 
       // Show alert
       Alert.alert(
         "Next Notification",
-        `Event: ${next.content.title}\n\n` +
-          `Fires at: ${readableDate}\n\n` +
-          `Time from now: ${timeFromNow}\n` +
-          `(${minutesUntil} minutes)\n\n` +
-          `ID: ${next.identifier.substring(0, 16)}...`
+        `Event: ${result.title}\n\n` +
+          `Fires at: ${result.readableDate}\n\n` +
+          `Time from now: ${result.compactTime}\n` +
+          `(${result.minutesUntil} minutes)\n\n` +
+          `ID: ${result.identifier.substring(0, 16)}...`
       );
     } catch (error) {
       devLogError(`Error viewing next notification: ${error.message}`);
